@@ -1,33 +1,29 @@
 import 'dart:async';
 import 'package:uts_toko_olahraga/Database/DbHelper.dart';
-import 'package:uts_toko_olahraga/EntryForm/EntryForm.dart';
 import 'package:uts_toko_olahraga/EntryForm/EntryFormKategori.dart';
 import 'package:uts_toko_olahraga/Model/Kategori.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:uts_toko_olahraga/Model/Item.dart';
 
-class Home extends StatefulWidget {
-      static String tag = 'home';
+class KategoriPage extends StatefulWidget {
+      static String tag = 'KategoriPage';
   @override
-  HomeState createState() => HomeState();
+  KategoriState createState() => KategoriState();
 }
 
-class HomeState extends State<Home> {
+class KategoriState extends State<KategoriPage> {
   DbHelper dbHelper = DbHelper();
   int count = 0;
-  List<Item> itemList;
+  List<Kategori> itemList;
   @override
   Widget build(BuildContext context) {
     if (itemList == null) {
-      // ignore: deprecated_member_use
-      itemList = List<Item>();
+      itemList = List<Kategori>();
     }
     return Scaffold(
       appBar: AppBar(
-        
-        title: Text('Daftar Barang'),
+        title: Text('Daftar Kategori'),
       ),
       body: Column(children: [
         Expanded(
@@ -38,13 +34,13 @@ class HomeState extends State<Home> {
           child: SizedBox(
             width: double.infinity,
             // ignore: deprecated_member_use
-             child: RaisedButton(
+            child: RaisedButton(
               child: Text("Tambah Item"),
               onPressed: () async {
                 var item = await navigateToEntryForm(context, null);  
                 if (item != null) {
                   //TODO 2 Panggil Fungsi untuk Insert ke DB
-                  int result = await dbHelper.insert(item);
+                  int result = await dbHelper.insertKategori(item);
                   if (result > 0) {
                     updateListView();
                   }
@@ -53,32 +49,14 @@ class HomeState extends State<Home> {
             ),
           ),
         ),
-        Container(
-          alignment: Alignment.bottomCenter,
-          child: SizedBox(
-            width: double.infinity,
-            // ignore: deprecated_member_use
-            child: RaisedButton(
-              color: Colors.greenAccent.shade400,
-              child: Text("Tambah Kategori"),
-              onPressed: () async {
-                var kategori = await navigateToEntry(context, null);
-        if (kategori != null) {
-          // ignore: unused_local_variable
-          int result = await dbHelper.insertKategori(kategori);
-        }
-              },
-            ),
-          ),
-        ),
       ]),
     );
   }
 
-  Future<Item> navigateToEntryForm(BuildContext context, Item item) async {
+  Future<Kategori> navigateToEntryForm(BuildContext context, Kategori item) async {
     var result = await Navigator.push(context,
         MaterialPageRoute(builder: (BuildContext context) {
-      return EntryForm(item);
+      return EntryFormKategori(item);
     }));
     return result;
   }
@@ -98,14 +76,6 @@ class HomeState extends State<Home> {
             title: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.only(right: 10),
-                  child: Text("|" + this.itemList[index].kode + "|",
-                  style: TextStyle(fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  ),
-                  ),
-                ),
-                Container(
                   child: Text(
                     this.itemList[index].name,
                     style: TextStyle(
@@ -114,23 +84,11 @@ class HomeState extends State<Home> {
                 )
               ],
             ),
-            subtitle: Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 5),
-                  child: Text(
-                    "Rp.  " + this.itemList[index].price.toString(),
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal),
-                  ),
-                ),
-              ],
-            ),
             trailing: GestureDetector(
               child: Icon(Icons.delete),
               onTap: () async {
                 //TODO 3 Panggil Fungsi untuk Delete dari DB berdasarkan Item
-                dbHelper.delete(this.itemList[index].id);
+                dbHelper.deleteKategori(this.itemList[index].id);
                 updateListView();
               },
             ),
@@ -138,7 +96,7 @@ class HomeState extends State<Home> {
               var item =
                   await navigateToEntryForm(context, this.itemList[index]);
               //TODO 4 Panggil Fungsi untuk Edit data
-              dbHelper.update(item);//
+              dbHelper.updateKategori(item);//
                 updateListView();
             },
           ),
@@ -152,7 +110,7 @@ class HomeState extends State<Home> {
     final Future<Database> dbFuture = dbHelper.initDb();
     dbFuture.then((database) {
       //TODO 1 Select data dari DB
-      Future<List<Item>> itemListFuture = dbHelper.getItemList();
+      Future<List<Kategori>> itemListFuture = dbHelper.getKategoriList();
       itemListFuture.then((itemList) {
         setState(() {
           this.itemList = itemList;
@@ -161,11 +119,4 @@ class HomeState extends State<Home> {
       });
     });
   }
-}
-Future<Kategori> navigateToEntry(BuildContext context, Kategori kategori) async {
-  var result = await Navigator.push(context,
-      MaterialPageRoute(builder: (BuildContext context) {
-    return EntryFormKategori(kategori);
-  }));
-  return result;
 }

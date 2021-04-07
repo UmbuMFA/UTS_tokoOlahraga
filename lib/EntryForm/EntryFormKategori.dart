@@ -44,7 +44,7 @@ class EntryFormState extends State<EntryFormKategori> {
                   controller: nameController,
                   keyboardType: TextInputType.text,
                   decoration: InputDecoration(
-                    labelText: 'Nama Barang',
+                    labelText: 'Nama Kategori',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(5.0),
                     ),

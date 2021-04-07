@@ -2,8 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-// import 'package:uts_toko_olahraga/Model/Item.dart';
-import 'package:uts_toko_olahraga/Model/Barang.dart';
+import 'package:uts_toko_olahraga/Model/Item.dart';
 import 'package:uts_toko_olahraga/Model/Kategori.dart';
 import 'package:uts_toko_olahraga/Model/User.dart';
 
@@ -35,26 +34,28 @@ class DbHelper {
 
   //buat tabel baru dengan nama item //ditambah kode dan stock
   void _createDb(Database db, int version) async {
+
     var batch = db.batch();
     batch.execute('DROP TABLE IF EXISTS barang');
     batch.execute('DROP TABLE IF EXISTS kategori');
     batch.execute('DROP TABLE IF EXISTS user');
-    await db.execute('''
-      CREATE TABLE barang (
+    
+    batch.execute('''
+      CREATE TABLE item (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kode TEXT, 
         name TEXT,
-        kode TEXT,
         price INTEGER,
         stock INTERGER
-        kategori text
-        FOREIGN KEY (kategori) REFERENCE kategori (name),
           )
  ''');
+ //// kategori text
+        // FOREIGN KEY (kategori) REFERENCE kategori (name),
 
- await db.execute('''
+      batch.execute('''
       CREATE TABLE kategori (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
+        name TEXT
           )
  ''');
     batch.execute('''
@@ -65,15 +66,16 @@ class DbHelper {
     name TEXT
     )
     ''');
+
     await batch.commit();
   }
 
   
 
-//select databases barang
+//select databases
   Future<List<Map<String, dynamic>>> select() async {
     Database db = await this.initDb();
-    var mapList = await db.query('barang', orderBy: 'name');
+    var mapList = await db.query('item', orderBy: 'name');
     return mapList;
   }
 
@@ -92,15 +94,16 @@ class DbHelper {
     return mapList;
   }
 
-//create databases barang
-  Future<int> insert(Barang object) async {
+  //create databases
+  Future<int> insert(Item object) async {
     Database db = await this.initDb();
-    int count = await db.insert('barang', object.toMap());
+    int count = await db.insert('item', object.toMap());
     return count;
   }
 
+
   //create databases Kategori
-  Future<int> insertKategori(Barang object) async {
+  Future<int> insertKategori(Kategori object) async {
     Database db = await this.initDb();
     int count = await db.insert('kategori', object.toMap());
     return count;
@@ -114,15 +117,15 @@ class DbHelper {
   }
 
 //update databases
-  Future<int> update(Barang object) async {
+  Future<int> update(Item object) async {
     Database db = await this.initDb();
     int count = await db
-        .update('barang', object.toMap(), where: 'id=?', whereArgs: [object.id]);
+        .update('item', object.toMap(), where: 'id=?', whereArgs: [object.id]);
     return count;
   }
 
   //update databases
-  Future<int> updateKategori(Barang object) async {
+  Future<int> updateKategori(Kategori object) async {
     Database db = await this.initDb();
     int count = await db
         .update('kategori', object.toMap(), where: 'id=?', whereArgs: [object.id]);
@@ -140,7 +143,7 @@ class DbHelper {
   //delete databases barang
   Future<int> delete(int id) async {
     Database db = await this.initDb();
-    int count = await db.delete('barang', where: 'id=?', whereArgs: [id]);
+    int count = await db.delete('item', where: 'id=?', whereArgs: [id]);
     return count;
   }
   
@@ -151,13 +154,13 @@ class DbHelper {
     return count;
   }
 
-  Future<List<Barang>> getItemList() async {
+  Future<List<Item>> getItemList() async {
     var itemMapList = await select();
     int count = itemMapList.length;
     // ignore: deprecated_member_use
-    List<Barang> itemList = List<Barang>();
+    List<Item> itemList = List<Item>();
     for (int i = 0; i < count; i++) {
-      itemList.add(Barang.fromMap(itemMapList[i]));
+      itemList.add(Item.fromMap(itemMapList[i]));
     }
     return itemList;
   }

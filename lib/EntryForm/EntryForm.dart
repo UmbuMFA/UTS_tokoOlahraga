@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:uts_toko_olahraga/Model/Item.dart';
-import 'package:uts_toko_olahraga/Model/Barang.dart';
+import 'package:uts_toko_olahraga/Model/Item.dart';
 
 class EntryForm extends StatefulWidget {
-  final Barang item;
+  final Item item;
   EntryForm(this.item);
   @override
   EntryFormState createState() => EntryFormState(this.item);
@@ -11,7 +10,7 @@ class EntryForm extends StatefulWidget {
 
 //class controller
 class EntryFormState extends State<EntryForm> {
-  Barang item;
+  Item item;
   EntryFormState(this.item);
   TextEditingController kodeController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -27,7 +26,7 @@ class EntryFormState extends State<EntryForm> {
       stockController.text = item.stock.toString();
     }
     //rubah
-    return Scaffold(
+     return Scaffold(
         appBar: AppBar(
           title: item == null ? Text('Tambah') : Text('Ubah'),
            leading: Container(
@@ -131,7 +130,7 @@ class EntryFormState extends State<EntryForm> {
                         onPressed: () {
                           if (item == null) {
                             // tambah data
-                            Barang(kodeController.text, 
+                            item = Item(kodeController.text, 
                                         nameController.text,
                                 int.parse(priceController.text),
                                 int.parse(stockController.text));
